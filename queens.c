@@ -1,5 +1,5 @@
 /*
- * $Id: queens.c,v 1.8 2015/07/22 20:58:33 urs Exp $
+ * $Id: queens.c,v 1.9 2015/07/22 20:58:43 urs Exp $
  *
  * Try to place n queens on a n by n chess board so that
  * no two queens attack each other.
@@ -8,15 +8,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static void solve(int col);
-static int  attacked(int col, int row);
-static void found(void);
-
-static int *pos;
-static int dim = 8;
+static void solve(int *pos, int dim, int col);
+static int  attacked(const int *pos, int col, int row);
+static void found(const int *pos, int dim);
 
 int main(int argc, char **argv)
 {
+	int dim = 8;
+	int *pos;
+
 	if (argc > 1)
 		dim = atoi(*++argv);
 
@@ -25,30 +25,30 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	solve(0);
+	solve(pos, dim, 0);
 
 	free(pos);
 
 	return 0;
 }
 
-static void solve(int col)
+static void solve(int *pos, int dim, int col)
 {
 	int row;
 
 	for (row = 0; row < dim; row++) {
-		if (attacked(col, row))
+		if (attacked(pos, col, row))
 			continue;
 
 		pos[col] = row;
 		if (col < dim - 1)
-			solve(col + 1);
+			solve(pos, dim, col + 1);
 		else
-			found();
+			found(pos, dim);
 	}
 }
 
-static int attacked(int col, int row)
+static int attacked(const int *pos, int col, int row)
 {
 	int c;
 
@@ -58,7 +58,7 @@ static int attacked(int col, int row)
 	return 0;
 }
 
-static void found(void)
+static void found(const int *pos, int dim)
 {
 	int c;
 
