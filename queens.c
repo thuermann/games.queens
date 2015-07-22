@@ -1,5 +1,5 @@
 /*
- * $Id: queens.c,v 1.4 2015/07/22 20:57:53 urs Exp $
+ * $Id: queens.c,v 1.5 2015/07/22 20:58:03 urs Exp $
  *
  * Try to place n queens on a n by n chess board so that
  * no two queens attack each other.
@@ -65,11 +65,9 @@ static void found(void)
 	if (!quiet) {
 		int c;
 
-		for (c = 0; c < dim; c++) {
-			printf("%c%d ",
-			       c + 'a', pos[c] + 1);
-		}
-		printf("\n");
+		for (c = 0; c < dim; c++)
+			printf("%c%d%c", c + 'a', pos[c] + 1,
+			       c < dim - 1 ? ' ' : '\n');
 	}
 	count++;
 }
