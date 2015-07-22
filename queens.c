@@ -1,5 +1,5 @@
 /*
- * $Id: queens.c,v 1.2 2015/07/22 20:57:33 urs Exp $
+ * $Id: queens.c,v 1.3 2015/07/22 20:57:43 urs Exp $
  *
  * Try to place n queens on a n by n chess board so that
  * no two queens attack each other.
@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static void solve(int x);
-static int  unattacked(int x, int y);
+static void solve(int col);
+static int  unattacked(int col, int row);
 
 static int *pos;
 static int count = 0;
@@ -35,20 +35,20 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-static void solve(int x)
+static void solve(int col)
 {
-	int y, px;
+	int row, c;
 
-	for (y = 0; y < dim; y++)
-		if (unattacked(x, y)) {
-			pos[x] = y;
-			if (x < dim - 1)
-				solve(x + 1);
+	for (row = 0; row < dim; row++)
+		if (unattacked(col, row)) {
+			pos[col] = row;
+			if (col < dim - 1)
+				solve(col + 1);
 			else {
 				if (!quiet) {
-					for (px = 0; px < dim; px++) {
+					for (c = 0; c < dim; c++) {
 						printf("%c%d ",
-						       px + 'a', pos[px] + 1);
+						       c + 'a', pos[c] + 1);
 					}
 					printf("\n");
 				}
@@ -57,12 +57,12 @@ static void solve(int x)
 		}
 }
 
-static int unattacked(int x, int y)
+static int unattacked(int col, int row)
 {
-	int i;
+	int c;
 
-	for (i = 0; i < x; i++)
-		if (y == pos[i] || abs(y - pos[i]) == x - i)
+	for (c = 0; c < col; c++)
+		if (row == pos[c] || abs(row - pos[c]) == col - c)
 			return 0;
 	return 1;
 }
