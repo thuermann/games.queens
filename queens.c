@@ -1,5 +1,5 @@
 /*
- * $Id: queens.c,v 1.5 2015/07/22 20:58:03 urs Exp $
+ * $Id: queens.c,v 1.6 2015/07/22 20:58:13 urs Exp $
  *
  * Try to place n queens on a n by n chess board so that
  * no two queens attack each other.
@@ -32,6 +32,8 @@ int main(int argc, char **argv)
 	solve(0);
 
 	printf("\nI found %d solutions\n", count);
+
+	free(pos);
 
 	return 0;
 }
