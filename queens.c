@@ -1,5 +1,5 @@
 /*
- * $Id: queens.c,v 1.3 2015/07/22 20:57:43 urs Exp $
+ * $Id: queens.c,v 1.4 2015/07/22 20:57:53 urs Exp $
  *
  * Try to place n queens on a n by n chess board so that
  * no two queens attack each other.
@@ -10,6 +10,7 @@
 
 static void solve(int col);
 static int  unattacked(int col, int row);
+static void found(void);
 
 static int *pos;
 static int count = 0;
@@ -37,23 +38,15 @@ int main(int argc, char **argv)
 
 static void solve(int col)
 {
-	int row, c;
+	int row;
 
 	for (row = 0; row < dim; row++)
 		if (unattacked(col, row)) {
 			pos[col] = row;
 			if (col < dim - 1)
 				solve(col + 1);
-			else {
-				if (!quiet) {
-					for (c = 0; c < dim; c++) {
-						printf("%c%d ",
-						       c + 'a', pos[c] + 1);
-					}
-					printf("\n");
-				}
-				count++;
-			}
+			else
+				found();
 		}
 }
 
@@ -65,4 +58,18 @@ static int unattacked(int col, int row)
 		if (row == pos[c] || abs(row - pos[c]) == col - c)
 			return 0;
 	return 1;
+}
+
+static void found(void)
+{
+	if (!quiet) {
+		int c;
+
+		for (c = 0; c < dim; c++) {
+			printf("%c%d ",
+			       c + 'a', pos[c] + 1);
+		}
+		printf("\n");
+	}
+	count++;
 }
