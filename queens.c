@@ -1,5 +1,5 @@
 /*
- * $Id: queens.c,v 1.1 1994/03/16 15:56:39 urs Exp $
+ * $Id: queens.c,v 1.2 2015/07/22 20:57:33 urs Exp $
  *
  * Try to place n queens on a n by n chess board so that
  * no two queens attack each other.
@@ -8,18 +8,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define FALSE 0
-#define TRUE !FALSE
+static void solve(int x);
+static int  unattacked(int x, int y);
 
-int unattacked(int x, int y);
-void solve(int x);
+static int *pos;
+static int count = 0;
+static int dim   = 8;
+static int quiet = 0;
 
-int *pos;
-int count = 0;
-int dim   = 8;
-int quiet = 0;
-
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	if (argc > 1 && **++argv == '-')
 		--argc, ++argv, quiet = 1;
@@ -38,7 +35,7 @@ main(int argc, char **argv)
 	return 0;
 }
 
-void solve(int x)
+static void solve(int x)
 {
 	int y, px;
 
@@ -60,13 +57,12 @@ void solve(int x)
 		}
 }
 
-
-int unattacked(int x, int y)
+static int unattacked(int x, int y)
 {
 	int i;
 
 	for (i = 0; i < x; i++)
 		if (y == pos[i] || abs(y - pos[i]) == x - i)
-			return FALSE;
-	return TRUE;
+			return 0;
+	return 1;
 }
