@@ -1,5 +1,5 @@
 /*
- * $Id: queens.c,v 1.7 2015/07/22 20:58:23 urs Exp $
+ * $Id: queens.c,v 1.8 2015/07/22 20:58:33 urs Exp $
  *
  * Try to place n queens on a n by n chess board so that
  * no two queens attack each other.
@@ -13,16 +13,12 @@ static int  attacked(int col, int row);
 static void found(void);
 
 static int *pos;
-static int count = 0;
-static int dim   = 8;
-static int quiet = 0;
+static int dim = 8;
 
 int main(int argc, char **argv)
 {
-	if (argc > 1 && **++argv == '-')
-		--argc, ++argv, quiet = 1;
 	if (argc > 1)
-		dim = atoi(*argv);
+		dim = atoi(*++argv);
 
 	if (!(pos = malloc(dim * sizeof(int)))) {
 		fputs("Insufficient memory.\n", stderr);
@@ -30,8 +26,6 @@ int main(int argc, char **argv)
 	}
 
 	solve(0);
-
-	printf("\nI found %d solutions\n", count);
 
 	free(pos);
 
@@ -66,12 +60,9 @@ static int attacked(int col, int row)
 
 static void found(void)
 {
-	if (!quiet) {
-		int c;
+	int c;
 
-		for (c = 0; c < dim; c++)
-			printf("%c%d%c", c + 'a', pos[c] + 1,
-			       c < dim - 1 ? ' ' : '\n');
-	}
-	count++;
+	for (c = 0; c < dim; c++)
+		printf("%c%d%c", c + 'a', pos[c] + 1,
+		       c < dim - 1 ? ' ' : '\n');
 }
