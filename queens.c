@@ -1,5 +1,5 @@
 /*
- * $Id: queens.c,v 1.10 2015/07/22 21:02:24 urs Exp $
+ * $Id: queens.c,v 1.11 2016/02/23 23:26:12 urs Exp $
  *
  * Try to place n queens on a n by n chess board so that
  * no two queens attack each other.
@@ -8,6 +8,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
+static void usage(const char *name)
+{
+	fprintf(stderr, "Usage: %s [-uv] [num]\n", name);
+}
 
 static void solve(int *pos, int dim, int col, int uniq);
 static int  attacked(const int *pos, int col, int row);
@@ -15,18 +21,37 @@ static int  checkdup(int *pos, int dim);
 static void mirror(int *pos, int dim);
 static void rotate(int *pos, int dim);
 static int  cmp(const int *a, const int *b, int dim);
-static void found(const int *pos, int dim);
+static void print_board(const int *pos, int dim);
+
+static int verbose = 0;
 
 int main(int argc, char **argv)
 {
 	int dim  = 8;
 	int uniq = 0;
 	int *pos;
+	int opt, errflag = 0;
 
-	if (argc > 1 && strcmp(*++argv, "-u") == 0)
-		--argc, ++argv, uniq = 1;
-	if (argc > 1)
-		dim = atoi(*argv);
+	while ((opt = getopt(argc, argv, "uv")) != -1) {
+		switch (opt) {
+		case 'u':
+			uniq = 1;
+			break;
+		case 'v':
+			verbose = 1;
+			break;
+		default:
+			errflag = 1;
+			break;
+		}
+	}
+	if (errflag || argc - optind > 1) {
+		usage(argv[0]);
+		exit(1);
+	}
+
+	if (optind < argc)
+		dim = atoi(argv[optind]);
 
 	if (!(pos = malloc(dim * sizeof(int)))) {
 		fputs("Insufficient memory.\n", stderr);
@@ -51,10 +76,10 @@ static void solve(int *pos, int dim, int col, int uniq)
 		pos[col] = row;
 		if (col < dim - 1)
 			solve(pos, dim, col + 1, uniq);
-		else if (uniq && checkdup(pos, dim))
+		else if (!uniq || !checkdup(pos, dim)) {
+			print_board(pos, dim);
 			putchar('\n');
-		else
-			found(pos, dim);
+		}
 	}
 }
 
@@ -72,25 +97,30 @@ static int checkdup(int *pos, int dim)
 {
 	int min[dim], tmp[dim];
 	int flag = 0;
-	int i;
+	int res, i;
 
 	memcpy(min, pos, sizeof(min));
 	memcpy(tmp, min, sizeof(tmp));
-	for (i = 0; i < 4; i++) {
-		if (cmp(tmp, min, dim) < 0) {
-			memcpy(min, tmp, dim * sizeof(int));
+	for (i = 0; i < 8; i++) {
+		if (i == 4)
+			mirror(tmp, dim);
+		res = cmp(tmp, min, dim);
+		if (verbose) {
+			printf("cmp: ");
+			print_board(tmp, dim);
+			printf(", ");
+			print_board(min, dim);
+			printf(": %d\n", res);
+		}
+		if (res < 0) {
+			memcpy(min, tmp, sizeof(min));
 			flag = 1;
 		}
 		rotate(tmp, dim);
 	}
-	mirror(tmp, dim);
-	for (i = 0; i < 4; i++) {
-		if (cmp(tmp, min, dim) < 0) {
-			memcpy(min, tmp, dim * sizeof(int));
-			flag = 1;
-		}
-		rotate(tmp, dim);
-	}
+	if (flag && verbose)
+		putchar('\n');
+
 	return flag;
 }
 
@@ -126,22 +156,13 @@ static int cmp(const int *a, const int *b, int dim)
 		if ((res = a[c] - b[c]) != 0)
 			break;
 
-	printf("cmp:");
-	for (c = 0; c < dim; c++)
-		printf(" %c%d", c + 'a', a[c] + 1);
-	putchar(',');
-	for (c = 0; c < dim; c++)
-		printf(" %c%d", c + 'a', b[c] + 1);
-	printf(": %d\n", res);
-
 	return res;
 }
 
-static void found(const int *pos, int dim)
+static void print_board(const int *pos, int dim)
 {
 	int c;
 
 	for (c = 0; c < dim; c++)
-		printf("%c%d%c", c + 'a', pos[c] + 1,
-		       c < dim - 1 ? ' ' : '\n');
+		printf(c == 0 ? "%c%d" : " %c%d", c + 'a', pos[c] + 1);
 }
