@@ -1,5 +1,5 @@
 /*
- * $Id: queens.c,v 1.11 2016/02/23 23:26:12 urs Exp $
+ * $Id: queens.c,v 1.12 2016/02/23 23:30:09 urs Exp $
  *
  * Try to place n queens on a n by n chess board so that
  * no two queens attack each other.
@@ -69,16 +69,18 @@ static void solve(int *pos, int dim, int col, int uniq)
 {
 	int row;
 
-	for (row = 0; row < dim; row++) {
-		if (attacked(pos, col, row))
-			continue;
-
-		pos[col] = row;
-		if (col < dim - 1)
-			solve(pos, dim, col + 1, uniq);
-		else if (!uniq || !checkdup(pos, dim)) {
+	if (col == dim) {
+		if (!uniq || !checkdup(pos, dim)) {
 			print_board(pos, dim);
 			putchar('\n');
+		}
+	} else {
+		for (row = 0; row < dim; row++) {
+			if (attacked(pos, col, row))
+				continue;
+
+			pos[col] = row;
+			solve(pos, dim, col + 1, uniq);
 		}
 	}
 }
