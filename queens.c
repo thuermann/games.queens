@@ -1,5 +1,5 @@
 /*
- * $Id: queens.c,v 1.12 2016/02/23 23:30:09 urs Exp $
+ * $Id: queens.c,v 1.13 2016/02/23 23:32:18 urs Exp $
  *
  * Try to place n queens on a n by n chess board so that
  * no two queens attack each other.
@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 	if (optind < argc)
 		dim = atoi(argv[optind]);
 
-	if (!(pos = malloc(dim * sizeof(int)))) {
+	if (!(pos = malloc(dim * sizeof(int))) && dim > 0) {
 		fputs("Insufficient memory.\n", stderr);
 		exit(1);
 	}
